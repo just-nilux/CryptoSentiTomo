@@ -1,0 +1,3 @@
+- Comparison between "tesseract" and "AbbyR" for R (OCR)
+
+http://www.cis.lmu.de/ocrworkshop/data/slides/m6-abbyy-tesseract.pdf
