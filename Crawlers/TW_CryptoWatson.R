@@ -12,7 +12,7 @@ rm(list = ls())
 # install packages if not available
 packages <- c('rtweet','twitteR','streamR', 'tesseract', 'abbyyR',
               'data.table','dplyr','scales','ggplot2','taskscheduleR',
-              'httr','stringr')
+              'httr','stringr','rvest')
 if (length(setdiff(packages, rownames(installed.packages()))) > 0) {
   install.packages(setdiff(packages, rownames(installed.packages())))
 }
@@ -65,7 +65,20 @@ write.table(watson_df,"CryptoWatson.csv", sep = ",")
 
 
 # Webpage scrapping and image extraction--------------
-page <- httr::GET("https://t.co/cajUDzvRHh")
+url <- "https://t.co/nPs4DT8Lbz"
+
+page <- content(GET(url))
+
+sess <- html_session(url)
+imgsrc <- sess %>%
+  read_html() %>%
+  html_node(xpath = '//*/img') %>%
+  html_attr('src')
+img <- jump_to(sess, paste0(url, imgsrc))
+
+writeBin(img$response$content, basename(imgsrc))
+
+
 
 # Execution every 1 hour --------------
 update <- userTimeline('CryptoWatson', n = 100,
