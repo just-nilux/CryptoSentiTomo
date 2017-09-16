@@ -5,7 +5,7 @@ setwd("C:/Users/BluePhoenix/Documents/GitHub/NextBigCrypto-Senti/Crawlers")
 rm(list = ls())
 
 # install packages if not available
-packages <- c('base64enc','httr')
+packages <- c('base64enc','httr','plyr','scales','rjson','ggplot2')
 if (length(setdiff(packages, rownames(installed.packages()))) > 0) {
   install.packages(setdiff(packages, rownames(installed.packages())))
 }
@@ -16,15 +16,15 @@ lapply(packages, require, character.only = TRUE)
 # This script should only be run once, to get the app-only authentication token
 # from Twitter.
 
-consumer_key = "yO6HMXQfaAazZfdyOQpPicX0M"
-consumer_secret = "wT1lq9bd7WWJjoVw3aHKfdHbpdjxd8r8RKc56fGiQPGRaJgILP"
+consumer_key = "cdi1LlwgzdXzR4Wxz8T3Gude6"
+consumer_secret = "s3hpLYXs9ULY1YwzyTRP8aRovp3rvkjUM9ue9usi8MotrvUgOG"
 key_secret = sprintf("%s:%s", consumer_key, consumer_secret)
 key_secret_enc = base64encode(charToRaw(key_secret))
 auth_str = sprintf("Authorization: Basic %s", key_secret_enc)
 
 twtr_dtls = POST(url="https://api.twitter.com/oauth2/token",
                  config=add_headers(c("Host: api.twitter.com",
-                                      "User-Agent: [app_name]",
+                                      "User-Agent: CryptoSentiTomo",
                                       auth_str,
                                       "Content-Type: application/x-www-form-urlencoded;charset=UTF-8",
                                       "Content-Length: 29",
@@ -33,13 +33,19 @@ twtr_dtls = POST(url="https://api.twitter.com/oauth2/token",
 
 bearer_token = content(twtr_dtls)$access_token
 
+# consumer key cdi1LlwgzdXzR4Wxz8T3Gude6
+# consumer secret s3hpLYXs9ULY1YwzyTRP8aRovp3rvkjUM9ue9usi8MotrvUgOG
+# access token 	240771509-MQiqGMegj3B4ohmRSi7mThfprMg7j9lAYkDB3s9W
+# access token secret YZGMyJ6Jz3Ncx1SG59QXJGaRrEkYjvCTC71KPsFH2eaIi
+
+#--------------------------------------------------
 app_only_auth = function() {
   # Returns the values that need to be sent in a GET
   # using application-only authentication.
   
-  bearer_token = "[redacted]"
+  bearer_token = "240771509-MQiqGMegj3B4ohmRSi7mThfprMg7j9lAYkDB3s9W"
   GET_headers = c("Host: api.twitter.com",
-                  "User-Agent: [app_name]",
+                  "User-Agent: CryptoSentiTomo",
                   sprintf("Authorization: Bearer %s", bearer_token),
                   "Accept-Encoding: gzip")
   
@@ -352,6 +358,44 @@ tweet_search = function(search_terms, result_type="recent", geocode="", max_id="
   }
 }
 
-searches <- c("1hr Report :")
-language <- "en"
-TW_df <- tweet_search(searches,language)
+# Testing Ground -------------------------------------------------
+
+
+searches = c("1 Hr Report :")
+search_names = "fr"
+language = "fr"
+coords = ""
+
+
+tweet_search(searches, lang = 'en', geocode = coords, n = 10)
+
+tweets_per_loop = 40000
+num_loops = 10
+
+for (loop_ct in 1:num_loops) {
+  for (i in 1:length(searches)) {
+    temp_tweet.df = tweet_search(searches[i], lang=language, max_id=max_id, geocode=coords, n=tweets_per_loop)
+    temp_tweet.df$search = search_names[i]
+    
+    if (i*loop_ct == 1) {
+      tweet.df = temp_tweet.df
+    } else {
+      tweet.df = rbind(tweet.df, temp_tweet.df)
+    }
+  }
+  
+  N = length(temp_tweet.df$id)
+  min_id = temp_tweet.df$id[N]
+  max_id = decrement_id(min_id)
+  
+  rm(temp_tweet.df)
+  
+  if (loop_ct < num_loops) {
+    ratelimit = search_rate_limit()
+    if (ratelimit$remaining < 450) {
+      sleep_time = ratelimit$reset + 60
+      print(sprintf("Sleeping for %d seconds; end of loop %d.", floor(sleep_time), loop_ct))
+      Sys.sleep(sleep_time)
+    }
+  }
+}
