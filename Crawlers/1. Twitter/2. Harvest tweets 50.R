@@ -36,3 +36,19 @@ BTC2 <- search_tweets(coins_list$ticker[1],
               until = '2017-10-03',
               include_rts = FALSE,
               retryonratelimit = TRUE)
+
+finalBTC <- rbind(backup,BTC2)
+
+write.csv(finalBTC,"BTC_W1_Oct.csv")
+
+# loop to collect more tweets (>18k)
+n <- 5 #number of loops
+s <- vector("list", n)
+max_id <- NULL
+for (i in seq_len(n)) {
+  s[[i]] <- search_tweets("supermax", n = 20000, since_id = max_id)
+  since_id <- tail(s[[i]]$user_id, 1)
+  sys.Sleep(60 * 15)
+}
+# should use this instead of normal rbind
+do.call(rbind.data.frame, s)
