@@ -18,9 +18,13 @@
 # 7. Return a word frequency table
 
 
-redditScrape <- function(subred = c('nameOfSubred', 'allTop'), time = c('day', 'week', 'month', 'year'), plotCloud = TRUE, saveText = FALSE, myDirectory = "/choose/a/directory") {
-  
-  
+redditScrape <- function(subred = c('nameOfSubred', 'allTop'), 
+                         time = c('day', 'week', 'month', 'year'), 
+                         plotCloud = TRUE, 
+                         saveText = FALSE, 
+                         myDirectory = "/choose/a/directory") {
+
+    
   #######################################################
   # 0. Load the required packages.  And check a few items
   
@@ -40,11 +44,10 @@ redditScrape <- function(subred = c('nameOfSubred', 'allTop'), time = c('day', '
   # 1. Make the url, get the page. 
   
   if (subred == 'allTop') {
-    url <- paste('http://www.reddit.com/top/?sort=top&t=', time, sep = "")
+    url <- paste('https://www.reddit.com/top/?sort=top&t=', time, sep = "")
   } else {	
-    url <- paste("http://www.reddit.com/r/", subred, "/top/?sort=top&t=", time, sep = "")
+    url <- paste("https://www.reddit.com/r/", subred, "/top/?sort=top&t=", time, sep = "")
   }
-  
   doc <- htmlParse(url)
   
   #######################################################
@@ -167,3 +170,5 @@ redditScrape <- function(subred = c('nameOfSubred', 'allTop'), time = c('day', '
   
   textTable
 }
+
+redditScrape("CryptoCurrency","day")

@@ -1,3 +1,5 @@
+# Plan to execute in 1-hr cycle --> OCR --> but fail (since the tesseract was not good)
+
 
 # Set up working directory
 setwd("C:/Users/BluePhoenix/Documents/GitHub/NextBigCrypto-Senti/Crawlers")
@@ -9,7 +11,7 @@ rm(list = ls())
 source("1.TW_Functions.R")
 
 # Get update reports (will set hourly)
-update <- get_report(30)
+update <- get_report(500)
 
 # Read from the past
 watsondf <- read.csv("CryptoWatson.csv")

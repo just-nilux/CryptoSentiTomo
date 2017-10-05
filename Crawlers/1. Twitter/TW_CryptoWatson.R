@@ -1,7 +1,7 @@
 # Steps
 # 1. Get tweets update from @CryptoWatson
 # 2. OCR to get data from 1-hr sentiments
-# 3. Setup bot to react trade for top 3 sentiments on Bittrex
+
 
 # Set up working directory
 setwd("C:/Users/BluePhoenix/Documents/GitHub/NextBigCrypto-Senti/Crawlers")
