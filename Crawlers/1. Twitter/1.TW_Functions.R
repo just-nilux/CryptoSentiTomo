@@ -16,7 +16,7 @@ lapply(packages, require, character.only = TRUE)
 
 # Twitter Crawler Setup --------------------------------
 
-# #Setting the Twitter authentication1
+#Setting the Twitter authentication1
 # consumer_key <- 'yO6HMXQfaAazZfdyOQpPicX0M'
 # consumer_secret <- 'wT1lq9bd7WWJjoVw3aHKfdHbpdjxd8r8RKc56fGiQPGRaJgILP'
 # access_token <- '379008223-8gPeX8OJ5wxjILXYUMxKwTSOH30UJbYdUWNqCE53'
