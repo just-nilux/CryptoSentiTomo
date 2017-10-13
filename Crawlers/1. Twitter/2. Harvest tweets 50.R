@@ -73,6 +73,9 @@ get_tweets <- function(i,ticker,n,TW_key){
   # Read the old data file
   old_df_path <- paste0(path_weekly,i,'_',ticker,'_','2017-10-07','.csv')
   old_df <- read.csv(old_df_path)
+  # Delete "X" column (error when saving files)
+  old_df<- old_df[, -which(names(old_df) %in% c("X"))]
+  
   #old_df <- old_df[, -which(names(old_df) %in% c("X"))]
   since <- max(old_df$status_id)
   
@@ -98,9 +101,10 @@ get_tweets <- function(i,ticker,n,TW_key){
 
 # assign Twitter Auth key before crawling
 TW_key <- 1
+# Since normally it would stop at # 36 - 37 ==> split into 2 pack with timeout 10 mins
 for (i in 1:nrow(coins_list)){
   get_tweets(coins_list$X[i],as.character(coins_list$ticker[i]),100000, TW_key)
   TW_key <- TW_key +1
   if (TW_key == 5){TW_key <- 1}
+  if (i == 36){Sys.sleep(900)} # sleep 15 betweens 36 - 37
 }
-
