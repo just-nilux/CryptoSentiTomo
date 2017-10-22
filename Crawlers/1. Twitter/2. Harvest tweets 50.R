@@ -11,10 +11,19 @@ setwd("C:/Users/BluePhoenix/Documents/GitHub/NextBigCrypto-Senti/Crawlers")
 # Clear environment
 rm(list = ls())
 
+# install packages if not available
+packages <- c('rtweet','twitteR', #Twitter API crawlers
+              'tesseract', 'magick', #image processing
+              'data.table','dplyr','scales','ggplot2','taskscheduleR',
+              'httr','stringr','rvest','curl','lubridate','coinmarketcapr')
+if (length(setdiff(packages, rownames(installed.packages()))) > 0) {
+  install.packages(setdiff(packages, rownames(installed.packages())))
+}
+lapply(packages, require, character.only = TRUE)
+
 # 1. Get coin list --------------------------------------------
 # Obtain list of coins --> extract tickers + coin names 
 # devtools::install_github("amrrs/coinmarketcapr")
-library(coinmarketcapr)
 
 # latest_marketcap <- get_marketcap_ticker_all('EUR')
 # 
@@ -71,7 +80,7 @@ get_tweets <- function(i,ticker,n,TW_key){
   swap_auth(TW_key)
   
   # Read the old data file
-  old_df_path <- paste0(path_weekly,i,'_',ticker,'_','2017-10-07','.csv')
+  old_df_path <- paste0(path,i,'_',ticker,'_','FULL','.csv')
   old_df <- read.csv(old_df_path)
   # Delete "X" column (error when saving files)
   old_df<- old_df[, -which(names(old_df) %in% c("X"))]
