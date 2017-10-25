@@ -22,16 +22,18 @@ redditScrape <- function(subred = c('nameOfSubred', 'allTop'),
                          time = c('day', 'week', 'month', 'year'), 
                          plotCloud = TRUE, 
                          saveText = FALSE, 
-                         myDirectory = "/choose/a/directory") {
+                         myDirectory = "/") {
 
     
   #######################################################
   # 0. Load the required packages.  And check a few items
+  # install packages if not available
   
-  require(XML)
-  require(RCurl)
-  require(RColorBrewer) 
-  require(wordcloud)
+  packages <- c('XML','RCurl','RColorBrewer','wordcloud')
+  if (length(setdiff(packages, rownames(installed.packages()))) > 0) {
+    install.packages(setdiff(packages, rownames(installed.packages())))
+  }
+  lapply(packages, require, character.only = TRUE)
   
   # if more than one time, apply function to each time frame separately
   if (length(time) > 1) { 
@@ -48,6 +50,7 @@ redditScrape <- function(subred = c('nameOfSubred', 'allTop'),
   } else {	
     url <- paste("https://www.reddit.com/r/", subred, "/top/?sort=top&t=", time, sep = "")
   }
+  
   doc <- htmlParse(url)
   
   #######################################################
@@ -171,4 +174,4 @@ redditScrape <- function(subred = c('nameOfSubred', 'allTop'),
   textTable
 }
 
-redditScrape("CryptoCurrency","day")
+df <- redditScrape("allTop","day")

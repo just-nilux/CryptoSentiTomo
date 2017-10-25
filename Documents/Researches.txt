@@ -1,5 +1,0 @@
-- Comparison between "tesseract" and "AbbyR" for R (OCR)
-http://www.cis.lmu.de/ocrworkshop/data/slides/m6-abbyy-tesseract.pdf
-
-- Twitter in R the "hard-way" (crawl up to 44900 tweets)
-https://pappubahry.com/misc/twitter_R/
