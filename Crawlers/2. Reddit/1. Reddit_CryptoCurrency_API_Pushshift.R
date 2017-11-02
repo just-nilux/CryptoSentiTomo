@@ -49,7 +49,7 @@ lapply(packages, require, character.only = TRUE)
 # reddit.df <- reddit.df[ , -which(names(reddit.df) %in%
 #                                    c("media","media_embed","preview",
 #                                      "secure_media","secure_media_embed"))]
-# 
+# report_path <- '2b. Reddit Report/'
 # # save genesis dataset
 # write.csv(reddit.df,paste0(report_path,'Crypto_Reddit.csv'))
 
@@ -92,7 +92,7 @@ crawl_reddit_pushshift <- function(epoch){
   return(final.df)
 }
 
-end_epoch <- as.numeric('1509494400') #1st Nov 00:00
+end_epoch <- as.numeric('1509580800') #2nd Nov 00:00
 
 # Continue to crawl Reddit until epoch time reach 1st Nov
 repeat{
@@ -114,7 +114,9 @@ repeat{
   write.csv(new.df,paste0(report_path,'Crypto_Reddit_',
                           substr(unix2POSIXct(max_epoch),0,10)
                           ,'.csv'))
- 
+
+  print(substr(unix2POSIXct(max_epoch),0,10))
+  
   # Overwrite final file
   write.csv(final.df,paste0(report_path,'Crypto_Reddit.csv'))
   if(max_epoch >= end_epoch){
@@ -122,5 +124,5 @@ repeat{
   }
 }
 
-# ----------------------------------
-
+# -------------------------------------------------------------
+# Can only crawl back until 3rd May 2017 due to API limitation
