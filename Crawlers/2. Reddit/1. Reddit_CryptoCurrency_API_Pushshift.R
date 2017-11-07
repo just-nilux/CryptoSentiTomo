@@ -1,7 +1,6 @@
 # Try APIs call on https://elasticsearch.pushshift.io
 
 #Set up working directory
-#setwd("C:/Users/BluePhoenix/Documents/GitHub/NextBigCrypto-Senti/Crawlers")
 setwd("~/GitHub/NextBigCrypto-Senti/Crawlers")
 
 # Clear environment
@@ -92,7 +91,8 @@ crawl_reddit_pushshift <- function(epoch){
   return(final.df)
 }
 
-end_epoch <- as.numeric('1509580800') #2nd Nov 00:00
+# Get current sys.time in epoch format
+end_epoch <- as.integer(as.POSIXct(Sys.time()))
 
 # Continue to crawl Reddit until epoch time reach 1st Nov
 repeat{
@@ -103,11 +103,18 @@ repeat{
   old.df <- old.df[ , -which(names(old.df) %in% c("X"))]
   
   # extract latest epoch time from old dataset
-  max_epoch <- as.numeric(max(old.df$created_utc))
+  max_epoch <- as.numeric(max(old.df$created_utc,na.rm = TRUE))
   
   # Start crawling and save to "Crypto_Reddit.csv"
   new.df <- crawl_reddit_pushshift(max_epoch)
   
+  # Check if new.df is null --> break
+  if (dim(new.df)[2] == 0) {
+    print('Finish Crawling')
+    break
+  }
+  
+  # merge old + new --> final df
   final.df <- bind_rows(old.df,new.df)
   
   # Save new.df base on epoch

@@ -1,7 +1,6 @@
 # Try APIs call on https://elasticsearch.pushshift.io
 
 #Set up working directory
-#setwd("C:/Users/BluePhoenix/Documents/GitHub/NextBigCrypto-Senti/Crawlers")
 setwd("~/GitHub/NextBigCrypto-Senti/Crawlers")
 
 # Clear environment
@@ -67,7 +66,7 @@ crawl_reddit_pushshift <- function(epoch){
   query <- "?q=&subreddit=cryptocurrency&stickied=false&locked=false&is_video=false&size=500"
   
   # query results after epoch time
-  query <- paste0(query,'&before=',epoch)
+  query <- paste0(query,'&after=',epoch)
   
   # extract data from API
   raw_data <- GET(url = url,
@@ -92,7 +91,8 @@ crawl_reddit_pushshift <- function(epoch){
   return(final.df)
 }
 
-end_epoch <- as.numeric('1483228800') #1st Jan 00:00
+# Get current sys.time in epoch format
+end_epoch <- as.integer(as.POSIXct(Sys.time()))
 
 # Continue to crawl Reddit until epoch time reach 1st Nov
 repeat{
@@ -103,23 +103,30 @@ repeat{
   old.df <- old.df[ , -which(names(old.df) %in% c("X"))]
   
   # extract latest epoch time from old dataset
-  min_epoch <- as.numeric(min(old.df$created_utc))
+  max_epoch <- as.numeric(max(old.df$created_utc, na.rm = TRUE))
   
   # Start crawling and save to "Crypto_Reddit.csv"
-  new.df <- crawl_reddit_pushshift(min_epoch)
+  new.df <- crawl_reddit_pushshift(max_epoch)
   
+  # Check if new.df is null --> break
+  if (dim(new.df)[2] == 0) {
+    print('Finish Crawling')
+    break
+  }
+  
+  # merge old + new --> final df
   final.df <- bind_rows(old.df,new.df)
   
   # Save new.df base on epoch
   write.csv(new.df,paste0(report_path,'CryptoMarkets_Reddit_',
-                          substr(unix2POSIXct(min_epoch),0,10)
+                          substr(unix2POSIXct(max_epoch),0,10)
                           ,'.csv'))
   
-  print(substr(unix2POSIXct(min_epoch),0,10))
+  print(substr(unix2POSIXct(max_epoch),0,10))
   
   # Overwrite final file
   write.csv(final.df,paste0(report_path,'CryptoMarkets_Reddit.csv'))
-  if(min_epoch <= end_epoch){
+  if(max_epoch >= end_epoch){
     break
   }
 }
