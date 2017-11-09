@@ -6,11 +6,11 @@
 options("scipen"=100, "digits"=4)
 
 # Set up working directory
-setwd("C:/Users/BluePhoenix/Documents/GitHub/NextBigCrypto-Senti/Crawlers")
+setwd("~/GitHub/NextBigCrypto-Senti/Crawlers")
 
 # Clear environment
 rm(list = ls())
-
+# devtools::install_github("mkearney/rtweet")
 # install packages if not available
 packages <- c('rtweet','twitteR', #Twitter API crawlers
               'tesseract', 'magick', #image processing
@@ -81,11 +81,14 @@ get_tweets <- function(i,ticker,n,TW_key){
   
   # Read the old data file
   old_df_path <- paste0(path,i,'_',ticker,'_','FULL','.csv')
-  old_df <- read.csv(old_df_path)
-  # Delete "X" column (error when saving files)
-  old_df<- old_df[, -which(names(old_df) %in% c("X"))]
+  old_df <- fread(old_df_path)
   
-  #old_df <- old_df[, -which(names(old_df) %in% c("X"))]
+  # Delete unrealated columns (error when saving files)
+  old_df <- old_df[,-1]
+  
+  # convert to date-time
+  old_df$created_at <- ymd_hms(old_df$created_at)
+  
   since <- max(old_df$status_id)
   
   df <- search_tweets(ticker,
@@ -95,17 +98,43 @@ get_tweets <- function(i,ticker,n,TW_key){
                       since_id = since,
                       include_rts = FALSE,
                       retryonratelimit = TRUE)
+  
+  # Keep only columns that fit with old.df
+  old_col <- colnames(old_df)
+  
+  # Due to Twitter API update Nov 2017 --> unlist columns
+  df$hashtags <- sapply(df$hashtags, paste, collapse = " ")
+  df$symbols <- sapply(df$symbols, paste, collapse = " ")
+  df$urls_url <- sapply(df$urls_url, paste, collapse = " ")
+  df$media_url <- sapply(df$media_url, paste, collapse = " ")
+  df$mentions_user_id <- sapply(df$mentions_user_id, paste, collapse = " ")
+  df$mentions_screen_name <- sapply(df$mentions_screen_name, paste, collapse = " ")
+  df$coords_coords <- sapply(df$coords_coords, paste, collapse = " ")
+  df$bbox_coords <- sapply(df$bbox_coords, paste, collapse = " ")
+  df$urls_expanded_url <- sapply(df$urls_expanded_url, paste, collapse = " ")
+  
+  # Due to Twitter API update Nov 2017 --> has to change names of some columns
+  names(df)[names(df) == 'urls_url'] <- 'urls'
+  names(df)[names(df) == 'coords_coords'] <- 'coordinates'
+  names(df)[names(df) == 'bbox_coords'] <- 'bounding_box_coordinates'
+  names(df)[names(df) == 'urls_expanded_url'] <- 'urls_expanded'
+  
+  # Filter only similar columns
+  df <- df[, which(names(df) %in% old_col)]
+  
   # Merge with old file
-  finaldf <- rbind(old_df,df)
+  finaldf <- bind_rows(old_df,df)
   
   # Print out current ticker
   print(paste(i,ticker))
   
+  # Save update weekly
+  write.csv(df,paste0(path_weekly,i,'_',ticker,'_',Sys.Date(),'.csv'))
+  
   # Write finaldf into newest csv file
   write.csv(finaldf,paste0(path,i,'_',ticker,'_FULL.csv'))
   
-  # Save update weekly
-  write.csv(df,paste0(path_weekly,i,'_',ticker,'_',Sys.Date(),'.csv'))
+
 }
 
 # assign Twitter Auth key before crawling
