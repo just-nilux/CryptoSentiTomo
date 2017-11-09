@@ -108,6 +108,10 @@ repeat{
   # Start crawling and save to "Crypto_Reddit.csv"
   new.df <- crawl_reddit_pushshift(max_epoch)
   
+  # Keep only list of columns same as old.df
+  old_col <- colnames(old.df)
+  new.df <- new.df[ , which(names(new.df) %in% old_col)]
+  
   # Check if new.df is null --> break
   if (dim(new.df)[2] == 0) {
     print('Finish Crawling')
