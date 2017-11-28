@@ -6,7 +6,7 @@
 options("scipen"=100, "digits"=4)
 
 # Set up working directory
-setwd("~/GitHub/NextBigCrypto-Senti/Crawlers")
+setwd("~/GitHub/NextBigCrypto-Senti/1. Crawlers")
 
 # Clear environment
 rm(list = ls())

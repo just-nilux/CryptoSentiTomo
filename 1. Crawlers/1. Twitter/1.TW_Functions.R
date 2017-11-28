@@ -1,5 +1,5 @@
 # Set up working directory
-setwd("C:/Users/BluePhoenix/Documents/GitHub/NextBigCrypto-Senti/Crawlers")
+setwd("C:/Users/BluePhoenix/Documents/GitHub/NextBigCrypto-Senti/1. Crawlers")
 
 # Clear environment
 rm(list = ls())

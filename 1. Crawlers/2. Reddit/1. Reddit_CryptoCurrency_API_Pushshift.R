@@ -1,7 +1,7 @@
 # Try APIs call on https://elasticsearch.pushshift.io
 
 #Set up working directory
-setwd("~/GitHub/NextBigCrypto-Senti/Crawlers")
+setwd("~/GitHub/NextBigCrypto-Senti/1. Crawlers")
 
 # Clear environment
 rm(list = ls())
